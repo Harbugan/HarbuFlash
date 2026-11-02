@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>HARBUFLASH v0.4.0 — Jungle Refined</title>
+<title>HARBUFLASH v0.4.1 — Jungle Refined</title>
 <style>
   html,body{margin:0;height:100%;background:#6c5eb5;color:#352879;font-family:monospace}
   body{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;min-height:100dvh;box-sizing:border-box;padding:20px 10px}
@@ -15,7 +15,7 @@
 </head>
 <body>
 <div id="screen"><canvas id="c" width="320" height="200"></canvas></div>
-<div id="help">← → MOVE &nbsp;·&nbsp; ↑ JUMP / CLIMB &nbsp;·&nbsp; ↓ CROUCH / DROP &nbsp;·&nbsp; SPACE FIRE<br>Grab a ledge, recover the Holocube, and reach the elevator. &nbsp;·&nbsp; P PAUSE</div><div id="meta"><strong>HARBUFLASH v0.2.0</strong> · Created by .::H∆RBUGΛП::.</div>
+<div id="help">← → MOVE &nbsp;·&nbsp; ↑ JUMP / CLIMB &nbsp;·&nbsp; ↓ CROUCH / DROP &nbsp;·&nbsp; SPACE FIRE<br>Grab a ledge, recover the Holocube, and reach the elevator. &nbsp;·&nbsp; P PAUSE</div><div id="meta"><strong>HARBUFLASH v0.4.1</strong> · Created by .::H∆RBUGΛП::.</div>
 <script>
 (()=>{
 'use strict';
@@ -178,7 +178,7 @@ try{highScore=Number(localStorage.getItem('harbuflash.highScore')||0)||0}catch(e
 function addScore(n){score+=n;if(score>highScore){highScore=score;try{localStorage.setItem('harbuflash.highScore',String(highScore))}catch(e){}}}
 let p,enemies,bullets;
 const SPD=62,JV=78,GRAV=640,JUMP=-230,COYOTE=.085,GRAB_MARGIN=7;
-function newPlayer(x,y){return{x,y,vx:0,vy:0,dir:1,st:'ground',crouch:false,hp:3,inv:0,anim:0,shoot:0,cd:0,noGrab:0,fall0:y,hang:null,climbT:0,deadT:0,coyote:0,turnT:0}}
+function newPlayer(x,y){return{x,y,vx:0,vy:0,dir:1,st:'ground',crouch:false,hp:3,inv:0,anim:0,shoot:0,cd:0,noGrab:0,fall0:y,hang:null,climbT:0,deadT:0,coyote:0,turnT:0,airT:0,landT:0}}
 function mkEnemies(){return[
   {k:'mutant',x:140,y:GY,dir:-1,hp:3,min:90,max:190},
   {k:'mutant',x:600,y:104,dir:-1,hp:3,min:556,max:640},
@@ -209,7 +209,7 @@ function fireBullet(){
 }
 
 function updPlayer(dt){
-  p.turnT=Math.max(0,(p.turnT||0)-dt);p.inv=Math.max(0,p.inv-dt);p.shoot=Math.max(0,p.shoot-dt);p.cd=Math.max(0,p.cd-dt);p.noGrab=Math.max(0,p.noGrab-dt);
+  p.turnT=Math.max(0,(p.turnT||0)-dt);p.landT=Math.max(0,(p.landT||0)-dt);p.inv=Math.max(0,p.inv-dt);p.shoot=Math.max(0,p.shoot-dt);p.cd=Math.max(0,p.cd-dt);p.noGrab=Math.max(0,p.noGrab-dt);
   if(p.st==='dead'){p.deadT+=dt;if(!supported(p)&&p.y<H+40){p.vy+=GRAV*dt;moveX(p,0,6);moveY(p,p.vy*dt,6)}
     if(p.deadT>1.9)respawn();return}
   const hv=(kR()?1:0)-(kL()?1:0);
@@ -223,20 +223,21 @@ function updPlayer(dt){
       if(p.x>EXIT.x&&p.x<EXIT.x+EXIT.w){
         if(hasCube){addScore(1000);if(p.hp===3)addScore(500);mode='win';winT=0;SFX.win();return}
         say('FIND THE HOLOCUBE FIRST!');SFX.deny();
-      }else{p.vy=JUMP;p.vx=hv*JV;if(hv)p.dir=hv;p.st='air';p.fall0=p.y;p.noGrab=.1;SFX.jump()}
+      }else{p.vy=JUMP;p.vx=hv*JV;if(hv)p.dir=hv;p.st='air';p.airT=0;p.landT=0;p.fall0=p.y;p.noGrab=.1;SFX.jump()}
     }
     if(p.st==='ground'){
       moveX(p,p.vx*dt,p.crouch?16:24);
-      if(!supported(p)){p.st='air';p.fall0=p.y;p.vy=0;p.coyote=COYOTE}
+      if(!supported(p)){p.st='air';p.airT=.12;p.fall0=p.y;p.vy=0;p.coyote=COYOTE}
     }
   }else if(p.st==='air'){
+    p.airT+=dt;
     p.coyote=Math.max(0,p.coyote-dt);
-    if(p.coyote>0&&pUp()){p.vy=JUMP;p.vx=hv*JV;p.st='air';p.coyote=0;p.noGrab=.1;SFX.jump()}
+    if(p.coyote>0&&pUp()){p.vy=JUMP;p.vx=hv*JV;p.st='air';p.airT=0;p.landT=0;p.coyote=0;p.noGrab=.1;SFX.jump()}
     p.vy=Math.min(420,p.vy+GRAV*dt);
     if(moveX(p,p.vx*dt,24))p.vx=0;
     const v0=p.vy,r=moveY(p,p.vy*dt,24);
     if(r===1&&v0>0){
-      const fall=p.y-p.fall0;p.st='ground';p.vx=0;p.vy=0;SFX.land();
+      const fall=p.y-p.fall0;p.st='ground';p.vx=0;p.vy=0;p.landT=.12;SFX.land();
       if(fall>=100){die();flash=.3}else if(fall>=70){hurt();say('OUCH! WATCH THE DROP')}
     }else if(p.noGrab<=0&&p.vy>-30){
       for(const s of solids){
@@ -253,7 +254,7 @@ function updPlayer(dt){
   }else if(p.st==='climb'){
     p.climbT+=dt/.7;const q=Math.min(1,p.climbT),h=p.hang,tx=h.face+p.dir*8,ty=h.s.y;
     p.y=h.y0+(ty-h.y0)*Math.min(1,q*1.7);p.x=h.x0+(tx-h.x0)*Math.max(0,(q-.5)*2);
-    if(q>=1){p.st='ground';p.x=tx;p.y=ty;p.vx=0;p.hang=null}
+    if(q>=1){p.st='ground';p.x=tx;p.y=ty;p.vx=0;p.landT=.10;p.hang=null}
   }
   p.x=clamp(p.x,8,WW-8);
   if(p.y>H+24&&p.st!=='dead'){die()}
@@ -456,7 +457,7 @@ function renderTitle(){
   textC('PRESS ENTER OR SPACE',126,Math.floor(t*3)%2?1:12,1);
   drawConrad({x:160,y:190,dir:1,vx:1,vy:0,st:'ground',anim:t*7,crouch:false,shoot:0,inv:0});
   R(0,190,W,10,9);R(0,190,W,2,5);
-  textC('INTO THE JUNGLE - V0.4.0',150,10,1);
+  textC('INTO THE JUNGLE - V0.4.1',150,10,1);
    textC('HIGH SCORE '+highScore,160,15,1);
 }
 function renderWin(){
