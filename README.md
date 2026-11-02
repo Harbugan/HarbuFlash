@@ -1,20 +1,41 @@
-# HARBUFLASH
+# HARBUFLASH v0.2.0 — Jungle Refined
 
-En 8-bit (C64-agtig) demake-POC af første bane (junglen) i *Flashback*. Ét `index.html`, ingen afhængigheder, åbn den bare i en browser.
+An authentic 8-bit jungle platformer inspired by classic cinematic platform games. Built with vanilla HTML, CSS and JavaScript, with no external dependencies.
 
-## Kontroller
-| Tast | Handling |
-|---|---|
-| ← → | Gå |
-| ↑ | Hop / kravl op fra en kant / gå ind i elevator |
-| ↓ | Dukk (undgår skud) / slip kanten |
-| Space | Skyd |
+## Play
 
-Hop mod en kant for at gribe den, tryk ↑ for at kravle op.
+Open `index.html` in a modern desktop browser.
 
-## Indhold
-- 3 flip-screen-skærme (320x200, C64-palette), lavagab, klippe og kravlekant
-- Flashback-agtig bevægelse: gå, hop med fastlåst retning, grib kant, kravl op, dukk, faldskade
-- 3 mutanter (nærkamp) og en vagt (skyder), shield med 3 point
-- Find holocuben og nå elevatoren for at klare banen
-- Chiptune-lydeffekter genereret med WebAudio
+| Key | Action |
+| --- | --- |
+| Left / Right or A / D | Walk |
+| Up or W | Jump, climb a ledge, enter the elevator |
+| Down or S | Crouch or release a ledge |
+| Space, Z, X or Left Ctrl | Fire |
+| P | Pause / resume |
+| Enter or Space | Start / restart |
+
+Find the Holocube and reach the elevator. Avoid the lava pit and enemies.
+
+## What's new in v0.2.0
+
+- English-only instructions, interface and documentation.
+- Refined retro frame, responsive layout and creator credit.
+- More forgiving ledge detection and a short coyote-time window for jumps.
+- Pause/resume support.
+- Score for enemies, Holocube collection and stage completion.
+- Persistent high score saved locally in the browser.
+
+## Technical notes
+
+- 320 × 200 internal canvas resolution with nearest-neighbor scaling.
+- Commodore 64-inspired 16-color palette.
+- Three flip-screen zones in the Jungle stage.
+- Procedural pixel art, character rigs and synthesized WebAudio sound effects.
+- No dependencies or build step.
+
+## Future stages
+
+The Jungle remains a single-page proof of concept. Future versions can extract shared input, rendering, physics and progression into reusable modules before adding more HTML stage pages.
+
+Created by .::H∆RBUGΛП::.
