@@ -1,4 +1,4 @@
-# HARBUFLASH v0.2.0 — Jungle Refined
+# HARBUFLASH v0.3.0 — Into the Jungle
 
 An authentic 8-bit jungle platformer inspired by classic cinematic platform games. Built with vanilla HTML, CSS and JavaScript, with no external dependencies.
 
@@ -17,7 +17,7 @@ Open `index.html` in a modern desktop browser.
 
 Find the Holocube and reach the elevator. Avoid the lava pit and enemies.
 
-## What's new in v0.2.0
+## What's new in v0.3.0
 
 - English-only instructions, interface and documentation.
 - Refined retro frame, responsive layout and creator credit.
@@ -39,3 +39,15 @@ Find the Holocube and reach the elevator. Avoid the lava pit and enemies.
 The Jungle remains a single-page proof of concept. Future versions can extract shared input, rendering, physics and progression into reusable modules before adding more HTML stage pages.
 
 Created by .::H∆RBUGΛП::.
+
+## Jungle expansion (v0.3.0)
+
+- Eight classic 320-pixel flip-screen rooms, with no smooth camera scrolling.
+- A longer route through increasingly dense jungle, ruins and an extraction point.
+- Additional elevated platforms, lava gaps and enemy encounters.
+- Revised six-pose walking animation intended to reduce backward-looking leg motion.
+- Existing score, pause, high-score and English UI are retained.
+
+### Playtest checklist
+
+Walk in both directions; jump and catch ledges; cross all three lava gaps; fight enemies; collect the Holocube near the end; enter the extraction elevator. Verify checkpoint respawns and score persistence. This version has not yet been browser-playtested.
