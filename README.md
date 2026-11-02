@@ -71,3 +71,12 @@ Walk in both directions; jump and catch ledges; cross all three lava gaps; fight
 - Retains the previous six-frame walking animation and classic flip-screen camera.
 
 **Testing:** Browser gameplay and visual animation QA are still required before merge. Check walk, jump, landing, ledge climb, death, and the complete jungle route.
+
+## v0.4.2 — Adventurer and ledge climb
+
+- Redesigned original blonde 16x32 protagonist with expressive pulp-platformer proportions, a defined face and boots; inspired by the *feel* of Rick Dangerous without reusing assets.
+- Maintains the six-frame walk cycle and the existing landing duration.
+- Distinct overhead catch, hanging, pull-up, knee-up and stand poses.
+- Ledge grab has a brief catch animation before up can initiate a climb.
+- Pull-up movement now uses eased phases, including a separate horizontal knee-over-ledge transition.
+- Review before merging: sprite readability, left/right mirroring, grabbing from both directions, ledge clearance, landings, shooting, crouching and death. Browser playtesting has not been performed.
