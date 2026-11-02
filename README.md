@@ -1,4 +1,4 @@
-# HARBUFLASH v0.3.0 — Into the Jungle
+# HARBUFLASH v0.4.0 — Character Sprites
 
 An authentic 8-bit jungle platformer inspired by classic cinematic platform games. Built with vanilla HTML, CSS and JavaScript, with no external dependencies.
 
@@ -17,7 +17,7 @@ Open `index.html` in a modern desktop browser.
 
 Find the Holocube and reach the elevator. Avoid the lava pit and enemies.
 
-## What's new in v0.3.0
+## What's new in v0.4.0
 
 - English-only instructions, interface and documentation.
 - Refined retro frame, responsive layout and creator credit.
@@ -40,7 +40,7 @@ The Jungle remains a single-page proof of concept. Future versions can extract s
 
 Created by .::H∆RBUGΛП::.
 
-## Jungle expansion (v0.3.0)
+## Jungle expansion (v0.4.0)
 
 - Eight classic 320-pixel flip-screen rooms, with no smooth camera scrolling.
 - A longer route through increasingly dense jungle, ruins and an extraction point.
@@ -51,3 +51,13 @@ Created by .::H∆RBUGΛП::.
 ### Playtest checklist
 
 Walk in both directions; jump and catch ledges; cross all three lava gaps; fight enemies; collect the Holocube near the end; enter the extraction elevator. Verify checkpoint respawns and score persistence. This version has not yet been browser-playtested.
+
+## Character sprite milestone (v0.4.0)
+
+- Original 16 × 32 pixel blonde boy sprite with the reference's blonde hair, brown jacket, blue trousers and dark boots.
+- Character palette is independent from the jungle background palette.
+- Frame atlas generated in `hero-sprites.js`; no external libraries or image services.
+- Initial idle, six-pose walk, turn and placeholder action poses integrated into the existing game.
+- All game text remains in English.
+
+**Work in progress:** The movement physics and level layout are intentionally unchanged. The jump, climb, crouch and death poses need animation refinement after the idle/walk visual review. The draft PR has not been browser-playtested.
