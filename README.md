@@ -61,3 +61,13 @@ Walk in both directions; jump and catch ledges; cross all three lava gaps; fight
 - All game text remains in English.
 
 **Work in progress:** The movement physics and level layout are intentionally unchanged. The jump, climb, crouch and death poses need animation refinement after the idle/walk visual review. The draft PR has not been browser-playtested.
+
+## v0.4.1 Character Polish
+
+- Preserves the 16x32 blonde boy's original hair, jacket and trouser colors.
+- Refines the face profile and hair silhouette.
+- Introduces separate takeoff, rising, apex, falling and landing sprite poses.
+- Uses air time and vertical velocity to choose jump poses without altering collision physics.
+- Retains the previous six-frame walking animation and classic flip-screen camera.
+
+**Testing:** Browser gameplay and visual animation QA are still required before merge. Check walk, jump, landing, ledge climb, death, and the complete jungle route.
