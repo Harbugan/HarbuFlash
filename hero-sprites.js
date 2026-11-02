@@ -1,4 +1,4 @@
-/* HARBUFLASH v0.4.0 - original 16x32 character frames.
+/* HARBUFLASH v0.4.1 - original 16x32 character frames.
    Pixel colors follow the user's blonde adventurer reference, not the world palette.
    Every pose is rendered into an offscreen 16x32 sprite before gameplay. */
 (function(){
@@ -27,18 +27,22 @@ function frame(kind,index){
   ];
   let legs=walk[index%6];
   if(kind==='idle'||kind==='turn'||kind==='shoot')legs=[[7,7,6],[9,9,10]];
-  if(kind==='jump')legs=[[7,6,5],[9,10,12]];
+  if(kind==='anticipate')legs=[[7,6,6],[9,10,10]];
+  if(kind==='takeoff')legs=[[7,5,4],[9,10,9]];
+  if(kind==='jump')legs=[[7,5,5],[9,11,11]];
+  if(kind==='apex')legs=[[7,6,6],[9,10,10]];
   if(kind==='fall')legs=[[7,5,4],[9,11,12]];
+  if(kind==='land')legs=[[7,6,6],[9,10,10]];
   if(kind==='hang'||kind==='climb')legs=[[7,6,5],[9,11,12]];
   if(kind==='crouch')legs=[[7,5,4],[9,10,11]];
   if(kind==='dead')legs=[[7,7,6],[9,9,10]];
-  if(kind==='crouch'){
+  if(kind==='crouch'||kind==='anticipate'||kind==='land'){
     r(4,24,9,3,'jacket');r(5,26,7,2,'blue');
     r(4,28,4,2,'boot');r(10,28,4,2,'boot');
   }else{
     leg(...legs[1],false);leg(...legs[0],true);
   }
-  const down=kind==='crouch'?8:0;
+  const down=kind==='crouch'?8:(kind==='anticipate'||kind==='land'?4:0);
   const up=kind==='hang'||kind==='climb'?-2:0;
   // Torso, backpack, collar and hair deliberately keep the same silhouette.
   r(5,11+down+up,7,9,'outline');
@@ -58,11 +62,14 @@ function frame(kind,index){
   r(7,5+down+up,5,7,'skin');
   r(10,7+down+up,2,2,'skinShade');
   r(12,8+down+up,1,1,'outline');
+  // Readable blonde fringe, darker sideburn and asymmetric profile.
   r(5,3+down+up,7,4,'hair');
   r(4,5+down+up,4,5,'hair');
   r(3,8+down+up,3,3,'hair');
   r(6,2+down+up,5,1,'hairShade');
   r(10,5+down+up,2,1,'hairShade');
+  r(4,10+down+up,2,2,'hairShade');
+  r(11,10+down+up,1,1,'skinShade');
   if(kind==='turn')r(9,8+down+up,1,1,'outline');
   if(kind==='dead'){
     const flat=document.createElement('canvas');flat.width=SIZE_W;flat.height=SIZE_H;
@@ -73,7 +80,7 @@ function frame(kind,index){
   return cv;
 }
 const atlas={};
-for(const k of ['idle','walk','turn','jump','fall','hang','climb','crouch','shoot','dead']){
+for(const k of ['idle','walk','turn','anticipate','takeoff','jump','apex','fall','land','hang','climb','crouch','shoot','dead']){
   atlas[k]=Array.from({length:k==='walk'?6:1},(_,i)=>frame(k,i));
 }
 function draw(ctx,o,time){
@@ -82,7 +89,13 @@ function draw(ctx,o,time){
   if(o.st==='dead')kind='dead';
   else if(o.st==='hang')kind='hang';
   else if(o.st==='climb')kind='climb';
-  else if(o.st==='air')kind=o.vy<0?'jump':'fall';
+  else if(o.st==='air'){
+    // Choose poses from real vertical velocity and elapsed air time.
+    // Physics controls motion; the sprite never changes the collision box.
+    const age=o.airT||0;
+    kind=age<.09?'takeoff':o.vy<-65?'jump':o.vy<45?'apex':'fall';
+  }
+  else if(o.landT>0)kind='land';
   else if(o.crouch)kind='crouch';
   else if(o.shoot>0)kind='shoot';
   else if(o.turnT>0)kind='turn';
