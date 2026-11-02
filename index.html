@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>HARBUFLASH v0.3.0 — Jungle Refined</title>
+<title>HARBUFLASH v0.4.0 — Jungle Refined</title>
 <style>
   html,body{margin:0;height:100%;background:#6c5eb5;color:#352879;font-family:monospace}
   body{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;min-height:100dvh;box-sizing:border-box;padding:20px 10px}
@@ -178,7 +178,7 @@ try{highScore=Number(localStorage.getItem('harbuflash.highScore')||0)||0}catch(e
 function addScore(n){score+=n;if(score>highScore){highScore=score;try{localStorage.setItem('harbuflash.highScore',String(highScore))}catch(e){}}}
 let p,enemies,bullets;
 const SPD=62,JV=78,GRAV=640,JUMP=-230,COYOTE=.085,GRAB_MARGIN=7;
-function newPlayer(x,y){return{x,y,vx:0,vy:0,dir:1,st:'ground',crouch:false,hp:3,inv:0,anim:0,shoot:0,cd:0,noGrab:0,fall0:y,hang:null,climbT:0,deadT:0,coyote:0}}
+function newPlayer(x,y){return{x,y,vx:0,vy:0,dir:1,st:'ground',crouch:false,hp:3,inv:0,anim:0,shoot:0,cd:0,noGrab:0,fall0:y,hang:null,climbT:0,deadT:0,coyote:0,turnT:0}}
 function mkEnemies(){return[
   {k:'mutant',x:140,y:GY,dir:-1,hp:3,min:90,max:190},
   {k:'mutant',x:600,y:104,dir:-1,hp:3,min:556,max:640},
@@ -209,14 +209,14 @@ function fireBullet(){
 }
 
 function updPlayer(dt){
-  p.inv=Math.max(0,p.inv-dt);p.shoot=Math.max(0,p.shoot-dt);p.cd=Math.max(0,p.cd-dt);p.noGrab=Math.max(0,p.noGrab-dt);
+  p.turnT=Math.max(0,(p.turnT||0)-dt);p.inv=Math.max(0,p.inv-dt);p.shoot=Math.max(0,p.shoot-dt);p.cd=Math.max(0,p.cd-dt);p.noGrab=Math.max(0,p.noGrab-dt);
   if(p.st==='dead'){p.deadT+=dt;if(!supported(p)&&p.y<H+40){p.vy+=GRAV*dt;moveX(p,0,6);moveY(p,p.vy*dt,6)}
     if(p.deadT>1.9)respawn();return}
   const hv=(kR()?1:0)-(kL()?1:0);
   if(p.st==='ground'){
     p.crouch=!!kD();
     if(p.crouch){p.vx=0;if(hv)p.dir=hv}
-    else if(hv&&p.shoot<=0){p.dir=hv;p.vx=hv*SPD;p.anim+=dt*9}
+    else if(hv&&p.shoot<=0){if(p.dir!==hv)p.turnT=.12;p.dir=hv;p.vx=hv*SPD;p.anim+=dt*9}
     else p.vx=0;
     if(kFire()&&p.cd<=0)fireBullet();
     if(pUp()&&!p.crouch){
@@ -319,6 +319,7 @@ function mkPen(o){
   return{segs,dots,S:(ax,ay,bx,by,w,c)=>segs.push([X(ax),Y(ay),X(bx),Y(by),w,c]),D:(x,y,c)=>dots.push([X(x),Y(y),c])};
 }
 function drawConrad(o){
+  if(window.HarbuHero){window.HarbuHero.draw(ctx,o,t);return}
   if(o.inv>0&&o.st!=='dead'&&Math.floor(t*20)%2===0)return;
   const {segs,dots,S,D}=mkPen(o);
   const hair=(cx,cy)=>{for(let x=-2;x<=2;x++)D(cx+x,cy-2,9);D(cx-2,cy-1,9);D(cx-2,cy,9);D(cx+1,cy,0)};
@@ -455,7 +456,7 @@ function renderTitle(){
   textC('PRESS ENTER OR SPACE',126,Math.floor(t*3)%2?1:12,1);
   drawConrad({x:160,y:190,dir:1,vx:1,vy:0,st:'ground',anim:t*7,crouch:false,shoot:0,inv:0});
   R(0,190,W,10,9);R(0,190,W,2,5);
-  textC('INTO THE JUNGLE - V0.3.0',150,10,1);
+  textC('INTO THE JUNGLE - V0.4.0',150,10,1);
    textC('HIGH SCORE '+highScore,160,15,1);
 }
 function renderWin(){
@@ -492,5 +493,6 @@ window.__g={get p(){return p},get enemies(){return enemies},set mode(v){mode=v},
   tp(x,y){p.x=x;p.y=y;p.st='ground';p.vx=p.vy=0}};
 })();
 </script>
+<script src="hero-sprites.js"></script>
 </body>
 </html>
