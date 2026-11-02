@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>HARBUFLASH v0.2.0 — Jungle Refined</title>
+<title>HARBUFLASH v0.3.0 — Jungle Refined</title>
 <style>
   html,body{margin:0;height:100%;background:#6c5eb5;color:#352879;font-family:monospace}
   body{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;min-height:100dvh;box-sizing:border-box;padding:20px 10px}
@@ -21,7 +21,7 @@
 'use strict';
 /* ===== HARBUFLASH - 8-bit demake of Flashback, level 1 (jungle) =====
    320x200 playfield, C64 palette, flip-screen like the original. */
-const W=320,H=200,GY=160,WW=960;
+const W=320,H=200,GY=160,WW=2560;
 const PAL=['#000000','#ffffff','#880000','#aaffee','#cc44cc','#00cc55','#0000aa','#eeee77',
            '#dd8855','#664400','#ff7777','#333333','#777777','#aaff66','#0088ff','#bbbbbb'];
 const main=document.getElementById('c').getContext('2d');
@@ -94,16 +94,27 @@ const pUp=()=>pressed.ArrowUp||pressed.KeyW,kFire=()=>keys.Space||keys.KeyZ||key
 const pStart=()=>pressed.Enter||pressed.Space;
 
 /* ---------- level ---------- */
+// Eight connected flip-screen rooms: open crash site, climbing, dense forest, ruins, and extraction.
 const solids=[
   {x:0,y:GY,w:420,h:40,t:'g'},
-  {x:468,y:GY,w:492,h:40,t:'g'},
+  {x:468,y:GY,w:632,h:40,t:'g'},
+  {x:1148,y:GY,w:612,h:40,t:'g'},
+  {x:1808,y:GY,w:752,h:40,t:'g'},
   {x:200,y:112,w:64,h:48,t:'r'},
-  {x:540,y:104,w:140,h:56,t:'r'}
+  {x:540,y:104,w:140,h:56,t:'r'},
+  {x:945,y:120,w:68,h:40,t:'r'},
+  {x:1225,y:116,w:68,h:44,t:'r'},
+  {x:1450,y:120,w:68,h:40,t:'r'},
+  {x:1630,y:112,w:72,h:48,t:'r'},
+  {x:1930,y:120,w:64,h:40,t:'r'},
+  {x:2160,y:112,w:128,h:48,t:'r'},
+  {x:2340,y:120,w:70,h:40,t:'r'}
 ];
-const PIT={x:420,w:48};
-const CUBE_POS={x:606,y:104};
-const EXIT={x:904,w:32};
-const CP=[{x:40,y:GY},{x:350,y:GY},{x:668,y:104}];
+const PITS=[{x:420,w:48},{x:1100,w:48},{x:1760,w:48}];
+const PIT=PITS[0];
+const CUBE_POS={x:2220,y:112};
+const EXIT={x:2504,w:32};
+const CP=[{x:40,y:GY},{x:350,y:GY},{x:700,y:GY},{x:1030,y:GY},{x:1330,y:GY},{x:1660,y:112},{x:2020,y:GY},{x:2350,y:120}];
 let bgC,fgC;
 
 function drawSolid(s,rnd){
@@ -133,7 +144,7 @@ function buildWorld(){
     dith(0,0,WW,104,0,6,.02,1);
     dith(0,104,WW,GY-104,6,5,0,.35);
     for(let x=6;x<WW;x+=26+(rnd()*34|0)){const w=4+(rnd()*5|0);R(x,0,w,GY,11);R(x+w-1,0,1,GY,0)}
-    for(const x of [60,148,282,376,494,716,842]){
+    for(const x of [60,148,282,376,494,716,842,1010,1185,1370,1555,1725,1900,2085,2270,2430]){
       const w=14;R(x,0,w,GY,9);R(x,0,2,GY,8);R(x+w-3,0,3,GY,0);
       for(let y=0;y<GY;y+=3)if(rnd()<.5)R(x+2+(rnd()*8|0),y,1,2+(rnd()*3|0),rnd()<.5?0:8);
       R(x-4,GY-7,w+8,7,9);R(x-6,GY-3,w+12,3,9);R(x-6,GY-7,1,7,0);R(x+w+5,GY-7,1,7,0);}
@@ -144,9 +155,8 @@ function buildWorld(){
         px(x,y,c);}
       if(rnd()<.18)R(x,ch,1,2+(rnd()*4|0),5);}
     for(const s of solids)drawSolid(s,rnd);
-    /* lava pit */
-    R(PIT.x,GY,PIT.w,40,0);dith(PIT.x,176,PIT.w,24,0,2,0,1);dith(PIT.x,190,PIT.w,10,2,8,0,1);
-    R(PIT.x,GY,1,40,11);R(PIT.x+PIT.w-1,GY,1,40,11);
+    /* Lava chasms separate the traversal sections. */
+    for(const pit of PITS){R(pit.x,GY,pit.w,40,0);dith(pit.x,176,pit.w,24,0,2,0,1);dith(pit.x,190,pit.w,10,2,8,0,1);R(pit.x,GY,1,40,11);R(pit.x+pit.w-1,GY,1,40,11)}
     for(const s of solids)if(s.t==='g')for(let x=s.x+2;x<s.x+s.w;x+=2+(rnd()*3|0))R(x,GY-1-(rnd()*3|0),1,2,rnd()<.5?5:13);
     /* crashed hoverbike */
     R(12,153,40,5,12);R(16,149,22,4,15);R(21,146,9,3,3);R(40,154,12,3,2);R(10,158,10,2,11);R(34,150,6,3,11);R(44,151,3,2,0);
@@ -173,10 +183,16 @@ function mkEnemies(){return[
   {k:'mutant',x:140,y:GY,dir:-1,hp:3,min:90,max:190},
   {k:'mutant',x:600,y:104,dir:-1,hp:3,min:556,max:640},
   {k:'mutant',x:780,y:GY,dir:-1,hp:3,min:720,max:850},
-  {k:'guard',x:884,y:GY,dir:-1,hp:2,cd:.8}
+  {k:'guard',x:884,y:GY,dir:-1,hp:2,cd:.8},
+  {k:'mutant',x:1040,y:GY,dir:-1,hp:3,min:1020,max:1080},
+  {k:'mutant',x:1360,y:GY,dir:-1,hp:3,min:1320,max:1430},
+  {k:'guard',x:1580,y:GY,dir:-1,hp:2,cd:1.1},
+  {k:'mutant',x:1700,y:112,dir:-1,hp:3,min:1640,max:1690},
+  {k:'mutant',x:2040,y:GY,dir:-1,hp:3,min:2000,max:2130},
+  {k:'guard',x:2430,y:GY,dir:-1,hp:2,cd:.8}
 ].map(e=>Object.assign({anim:0,atk:0,cd:0,dead:0,hit:0,flash:0},e,{cd:e.cd||0}))}
 function reset(){p=newPlayer(CP[0].x,CP[0].y);hasCube=false;enemies=mkEnemies();bullets=[];msg='';fade=1;score=0;paused=false}
-function respawn(){const s=clamp(Math.floor(p.x/320),0,2);p=newPlayer(CP[s].x,CP[s].y);enemies=mkEnemies();bullets=[];fade=1}
+function respawn(){const s=clamp(Math.floor(p.x/320),0,CP.length-1);p=newPlayer(CP[s].x,CP[s].y);enemies=mkEnemies();bullets=[];fade=1}
 const say=(m,d=3)=>{msg=m;msgT=d};
 function hurt(){if(p.inv>0||p.st==='dead')return;p.hp--;p.inv=1.2;flash=.12;SFX.hit();if(p.hp<=0)die()}
 function die(){if(p.st==='dead')return;p.st='dead';p.deadT=0;p.hp=0;p.vx=0;SFX.die()}
@@ -330,19 +346,21 @@ function drawConrad(o){
     if(o.shoot>0){arm(1,-10,8,-9,9);S(9,-9,12,-9,2,12);if(o.shoot>.1){D(13,-9,7);D(14,-9,1);D(14,-10,7);D(14,-8,7)}}
     else arm(1,-10,5,-7,9);
   }else{
-    const s=Math.sin(o.anim),c=Math.cos(o.anim);
-    const bob=moving&&Math.abs(c)<.5?1:0;
-    let fa=[-2,0],fb=[2,0];
-    if(moving){fa=[-s*5,-Math.max(0,c)*4];fb=[s*5,-Math.max(0,-c)*4]}
-    S(0,-10+bob,Math.round(fa[0]),Math.round(fa[1]),3,6);boot(Math.round(fa[0])-1,Math.round(fa[1]));
-    S(0,-10+bob,Math.round(fb[0]),Math.round(fb[1]),3,14);boot(Math.round(fb[0])-1,Math.round(fb[1]));
+    // A six-pose contact/passing cycle avoids the reversed-looking sine-wave legs.
+    // Positive local X always means forward, regardless of facing direction.
+    const gait=[[-4,0,4,-2],[-2,0,2,-4],[1,-2,-1,0],[4,-2,-4,0],[2,-4,-2,0],[-1,0,1,-2]];
+    const pose=moving?gait[Math.floor(o.anim*1.45)%gait.length]:[-2,0,2,0];
+    const bob=moving&&(Math.floor(o.anim*1.45)%3===1)?1:0;
+    const [ax,ay,bx,by]=pose;
+    S(0,-10+bob,ax,ay,3,6);boot(ax-1,ay);
+    S(0,-10+bob,bx,by,3,14);boot(bx-1,by);
     S(0,-17+bob,0,-11+bob,5,9);D(2,-16+bob,8);D(2,-14+bob,1);
     S(0,-22+bob,0,-22+bob,5,8);hair(0,-22+bob);
     if(o.shoot>0){
       arm(0,-16,-1,-9,9);arm(0,-16+bob,8,-14,9);S(9,-14,12,-14,2,12);
       if(o.shoot>.1){D(13,-14,7);D(14,-14,1);D(14,-15,7);D(14,-13,7)}
     }else{
-      const sw=moving?Math.round(s*3):0;
+      const sw=moving?Math.round((ax-bx)*.5):0;
       arm(0,-16+bob,-sw,-9,9);arm(0,-16+bob,sw,-9,9);
     }
   }
@@ -392,13 +410,18 @@ function drawWorld(cam){
     R(sx,sy,ph<.4?3:2,ph<.4?3:2,ph<.5?12:11)}
   if(Math.floor(t*10)%3===0)px(42,152,7);
   /* lava bubbles */
-  for(let i=0;i<5;i++){const ph=(t*.8+i*.37)%1;px(PIT.x+4+((i*9)%40),Math.round(194-ph*9),ph<.6?8:7)}
+  for(const pit of PITS)for(let i=0;i<5;i++){const ph=(t*.8+i*.37)%1;px(pit.x+4+((i*9)%40),Math.round(194-ph*9),ph<.6?8:7)}
   /* exit lamp */
   R(EXIT.x+12,124,8,3,hasCube?(Math.floor(t*4)%2?5:13):(Math.floor(t*2)%2?2:10));
   /* hints */
   text('LEFT/RIGHT WALK   UP JUMP',44,30,1,1);text('DOWN DUCK   SPACE FIRE',46,38,1,1);
   text('JUMP AT LEDGE TO GRAB',150,92,10,1);text('THEN PRESS UP',166,100,10,1);
   text('JUMP THE LAVA',376,134,10,1);
+   text('DEEPER INTO THE JUNGLE',1000,40,3,1);
+   text('WATCH YOUR STEP',1108,135,10,1);
+   text('ANCIENT RUINS',1460,82,7,1);
+   text('THE FOREST GROWS DARK',1830,38,3,1);
+   text('EXTRACTION POINT',2320,80,3,1);
   drawCube();
   for(const e of enemies){if(e.k==='mutant')drawMutant(e);else drawGuard(e)}
   for(const b of bullets){R(b.x-2,b.y,5,1,b.o==='p'?7:10);R(b.x-1,b.y-1,3,3,b.o==='p'?1:2)}
@@ -432,7 +455,7 @@ function renderTitle(){
   textC('PRESS ENTER OR SPACE',126,Math.floor(t*3)%2?1:12,1);
   drawConrad({x:160,y:190,dir:1,vx:1,vy:0,st:'ground',anim:t*7,crouch:false,shoot:0,inv:0});
   R(0,190,W,10,9);R(0,190,W,2,5);
-  textC('JUNGLE REFINED - V0.2.0',150,10,1);
+  textC('INTO THE JUNGLE - V0.3.0',150,10,1);
    textC('HIGH SCORE '+highScore,160,15,1);
 }
 function renderWin(){
@@ -447,7 +470,7 @@ function render(){
   ctx=main;
   if(mode==='title')return renderTitle();
   if(mode==='win')return renderWin();
-  const cam=clamp(Math.floor(p.x/320),0,2)*320;
+  const cam=clamp(Math.floor(p.x/320),0,WW/W-1)*320;
   drawWorld(cam);hud(cam);
   if(paused){R(66,75,188,50,0);textC('PAUSED',84,3,2,6);textC('PRESS P TO RESUME',108,15,1)}
   if(p.st==='dead'&&p.deadT>.5){R(0,84,W,30,0);textC('CONRAD IS DOWN - RETRYING',96,10,1)}
